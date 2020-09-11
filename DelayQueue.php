@@ -7,7 +7,6 @@ include $GLOBALS['DELAY_QUEUE_ROOT'] . "/bundle/model/Shm.php";
 include $GLOBALS['DELAY_QUEUE_ROOT'] . "/operation/Dispatch.php";
 class DelayQueue {
 
-    const ASYN_TASK_CHANNEL =  'asyn_task_channel';
     const TASK_SORTED_QUEUE = 'task_sorted_queue';
 
     public static $objStorageEvent = null;
@@ -68,6 +67,9 @@ class DelayQueue {
      * 监听任务队列
      */
     public static function listion() {
-
+//        while (true) {
+            (new Dispatch())->execute();
+            usleep(100);
+//        }
     }
 }

@@ -2,17 +2,30 @@
 
 class Dispatch {
 
+
     /**
      * 添加任务
      * @param $objTask
      * @return bool
      */
-    function addReadyTask($objTask) {
+    public function addReadyTask($objTask) {
         $isExists = $this->taskExists($objTask->task_id);
         if(true == $isExists) {
             return false;
         }
         return $this->addTaskQueue($objTask);
+    }
+
+    public function execute() {
+        $ret = $this->getExecQueue(microtime(true));
+        if(false == $ret) {
+            return false;
+        }
+        foreach ($ret as $key => $value) {
+            // 获取相关任务信息， 获取topic 信息，组合调用包 调用
+
+            // 从队列中删除任务以及，任务详细信息
+        }
     }
 
     /**
@@ -56,7 +69,7 @@ class Dispatch {
      */
     private function getExecQueue($endTime) {
         try {
-            $ret = DelayQueue::$objStorageEvent->notify('zadd', [DelayQueue::TASK_SORTED_QUEUE, 0, $endTime]);
+            $ret = DelayQueue::$objStorageEvent->notify('zrange', [DelayQueue::TASK_SORTED_QUEUE, 0, -1]);
             if(false == $ret) {
                 return false;
             }

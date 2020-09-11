@@ -41,8 +41,9 @@ class Event {
     public function notify($method, $arguments) {
         foreach ($this->objServer as $ObServer) {
             $ObServer->connect();
-            call_user_func_array(array($ObServer, $method), $arguments);
+            $data[] = json_encode( call_user_func_array(array($ObServer, $method), $arguments));
         }
+        return array_map(function($v){return json_decode($v, true);},  array_unique($data))[0];
     }
 
 }
