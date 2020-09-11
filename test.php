@@ -30,27 +30,29 @@ class Test {
 
 
     public function newTask() {
-        // 新建任务
-        $t = new Task();
-        $t->topic = 'a';
-        $t->data = ['1','2','3'];
-        $t->wait_time = 1000;
-        $t->is_sync = false;
-        DelayQueue::task($t);
+        // 新建任务1
+        $t1 = new Task();
+        $t1->topic = 'a';
+        $t1->data = ['1','2','3'];
+        $t1->wait_time = 1000;
+        $t1->is_sync = false;
+        // 新建任务2
+        $t2 = new Task();
+        $t2->topic = 'a';
+        $t2->data = ['1','2','3'];
+        $t2->wait_time = 2000;
+        $t2->is_sync = false;
+        // 新建任务3
+        $t3 = new Task();
+        $t3->topic = 'a';
+        $t3->data = ['1','2','3'];
+        $t3->wait_time = 3000;
+        $t3->is_sync = false;
 
-        $t = new Task();
-        $t->topic = 'a';
-        $t->data = ['1','2','3'];
-        $t->wait_time = 2000;
-        $t->is_sync = false;
-        DelayQueue::task($t);
 
-        $t = new Task();
-        $t->topic = 'a';
-        $t->data = ['1','2','3'];
-        $t->wait_time = 10000;
-        $t->is_sync = false;
-        DelayQueue::task($t);
+        DelayQueue::task($t1);
+        DelayQueue::task($t2);
+        DelayQueue::task($t3);
     }
 
 

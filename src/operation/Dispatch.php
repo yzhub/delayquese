@@ -21,24 +21,27 @@ class Dispatch {
         if(false == $arrTaskList) {
             return false;
         }
-
+        $arrTaskList =  array_chunk($arrTaskList, 100);
         // 数据打包
-        foreach ($arrTaskList as $key => $value) {
-            // 获取相关任务信息， 获取topic 信息，组合调用包 调用
-            $objTask = $this->getTaskInfo($value);
-            if(false == $objTask) {
-                continue;
-            }
-            $objTopic = $this->getTopicInfo($objTask->topic);
-            if(false == $objTopic) {
-                continue;
-            }
-            // 执行数据
-            (new Execute())->run($objTopic, $objTask);
+        foreach ($arrTaskList as $item) {
+            foreach ($item as $node) {
+                // 获取相关任务信息， 获取topic 信息，组合调用包 调用
+                $objTask = $this->getTaskInfo($node);
+                if(false == $objTask) {
+                    continue;
+                }
+                $objTopic = $this->getTopicInfo($objTask->topic);
+                if(false == $objTopic) {
+                    continue;
+                }
+                // 执行数据
+                (new Execute())->run($objTopic, $objTask);
 
-            // 从队列中删除任务以及，任务详细信息
-            $this->delTaskQueus($value);
-            $this->delTaskInfo($value);
+                // 从队列中删除任务以及，任务详细信息
+                $this->delTaskQueus($node);
+                $this->delTaskInfo($node);
+            }
+            usleep(100);
         }
     }
 
