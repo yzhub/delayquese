@@ -17,14 +17,28 @@ class Dispatch {
     }
 
     public function execute() {
-        $ret = $this->getExecQueue(microtime(true));
-        if(false == $ret) {
+        $arrTaskList = $this->getExecQueue( intval(microtime(true) * 1000));
+        if(false == $arrTaskList) {
             return false;
         }
-        foreach ($ret as $key => $value) {
+
+        // 数据打包
+        foreach ($arrTaskList as $key => $value) {
             // 获取相关任务信息， 获取topic 信息，组合调用包 调用
+            $objTask = $this->getTaskInfo($value);
+            if(false == $objTask) {
+                continue;
+            }
+            $objTopic = $this->getTopicInfo($objTask->topic);
+            if(false == $objTopic) {
+                continue;
+            }
+            // 执行数据
+            (new Execute())->run($objTopic, $objTask);
 
             // 从队列中删除任务以及，任务详细信息
+            $this->delTaskQueus($value);
+            $this->delTaskInfo($value);
         }
     }
 
@@ -69,7 +83,7 @@ class Dispatch {
      */
     private function getExecQueue($endTime) {
         try {
-            $ret = DelayQueue::$objStorageEvent->notify('zrange', [DelayQueue::TASK_SORTED_QUEUE, 0, -1]);
+            $ret = DelayQueue::$objStorageEvent->notify('zrangebyscore', [DelayQueue::TASK_SORTED_QUEUE, 0, $endTime]);
             if(false == $ret) {
                 return false;
             }
@@ -77,6 +91,60 @@ class Dispatch {
             return false;
         }
         return $ret;
+    }
+
+    /**
+     * 获取任务详细信息
+     * @param $taskId
+     */
+    public function getTaskInfo($taskId) {
+        try {
+            $ret = DelayQueue::$objStorageEvent->notify('get', [$taskId]);
+            if(false == $ret) {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+        return unserialize($ret);
+    }
+
+    /**
+     * 获取topicId 信息
+     * @param $topicId
+     */
+    public function getTopicInfo($topicId) {
+        $objShm = new Shm();
+        if(false == $objShm->find($topicId)) {
+            return false;
+        }
+        return $objShm->read($topicId);
+    }
+
+
+    public function delTaskInfo($taskId) {
+        try {
+            $ret = DelayQueue::$objStorageEvent->notify('del', [$taskId]);
+            if(false == $ret) {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public function delTaskQueus($taskId) {
+        try {
+            $ret = DelayQueue::$objStorageEvent->notify('zdelete', [DelayQueue::TASK_SORTED_QUEUE, $taskId]);
+            if(false == $ret) {
+                return false;
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
     }
 }
 

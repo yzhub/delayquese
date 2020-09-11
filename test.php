@@ -34,21 +34,21 @@ class Test {
         $t = new Task();
         $t->topic = 'a';
         $t->data = ['1','2','3'];
-        $t->wait_time = 100;
+        $t->wait_time = 1000;
         $t->is_sync = false;
         DelayQueue::task($t);
 
         $t = new Task();
         $t->topic = 'a';
         $t->data = ['1','2','3'];
-        $t->wait_time = 100;
+        $t->wait_time = 2000;
         $t->is_sync = false;
         DelayQueue::task($t);
 
         $t = new Task();
         $t->topic = 'a';
         $t->data = ['1','2','3'];
-        $t->wait_time = 100;
+        $t->wait_time = 10000;
         $t->is_sync = false;
         DelayQueue::task($t);
     }
